@@ -18,10 +18,7 @@ git clone https://github.com/erictzeng/trajopt
 cd trajopt
 git checkout trajopt-jointopt
 cd ..
-git clone https://github.com/hojonathanho/bulletsim.git
-cd bulletsim
-git checkout lite
-cd ..
+git clone --branch=lite https://github.com/hojonathanho/bulletsim.git
 
 mkdir -p build/trajopt
 mkdir -p build/bulletsim
