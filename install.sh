@@ -7,6 +7,8 @@ sudo echo "deb http://ppa.launchpad.net/openrave/testing/ubuntu precise main" > 
 sudo echo "deb-src http://ppa.launchpad.net/openrave/testing/ubuntu precise main" >> openrave-testing.list 
 sudo mv openrave-testing.list /etc/apt/sources.list.d
 
+sudo apt-get update
+
 sudo apt-get install openrave0.9-dp openrave0.9-dp-base openrave0.9-dp-dev
 sudo ln -s /usr/lib/python2.7/dist-packages/openravepy/_openravepy_0_9 /usr/lib/python2.7/dist-packages/openravepy/_openravepy_
 
@@ -14,10 +16,7 @@ sudo apt-get install -y libopenscenegraph-dev cmake libboost-all-dev libeigen3-d
 sudo apt-get install -y python-numpy python-networkx python-joblib
 sudo apt-get install -y libpcl-1.7-all
 
-git clone https://github.com/erictzeng/trajopt
-cd trajopt
-git checkout trajopt-jointopt
-cd ..
+git clone --branch=trajopt-jointopt https://github.com/erictzeng/trajopt
 git clone --branch=lite https://github.com/hojonathanho/bulletsim.git
 
 mkdir -p build/trajopt
