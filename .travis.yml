@@ -4,5 +4,5 @@ python:
 script: python -m unittest discover -s test
 
 before_install:
-  - ./install.sh
+  - sudo ./install.sh
 
