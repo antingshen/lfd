@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -ex
 
 # cd ~
 
@@ -13,9 +13,9 @@ sudo apt-get install openrave0.9-dp openrave0.9-dp-base openrave0.9-dp-dev
 sudo ln -s /usr/lib/python2.7/dist-packages/openravepy/_openravepy_0_9 /usr/lib/python2.7/dist-packages/openravepy/_openravepy_
 
 # remove --force-yes if running manually
-sudo apt-get install -y --force-yes libopenscenegraph-dev cmake libboost-all-dev libeigen3-dev
-sudo apt-get install -y python-numpy python-networkx python-joblib
-sudo apt-get install -y libpcl-1.7-all
+sudo apt-get install --force-yes libopenscenegraph-dev cmake libboost-all-dev libeigen3-dev
+sudo apt-get install --force-yes python-numpy python-networkx python-joblib
+sudo apt-get install --force-yes libpcl-1.7-all
 
 git clone --branch=trajopt-jointopt https://github.com/erictzeng/trajopt
 git clone --branch=lite https://github.com/hojonathanho/bulletsim.git
