@@ -3,14 +3,15 @@ set -ex
 
 # cd ~
 
-sudo apt-get install -y openscenegraph
+sudo apt-get build-dep libopenscenegraph-dev
+sudo apt-get -b source -t trusty libopenscenegraph-dev
 sudo apt-get install -y cmake libboost-all-dev libeigen3-dev
 
 sudo echo "deb http://ppa.launchpad.net/openrave/testing/ubuntu precise main" > openrave-testing.list 
 sudo echo "deb-src http://ppa.launchpad.net/openrave/testing/ubuntu precise main" >> openrave-testing.list 
 sudo mv openrave-testing.list /etc/apt/sources.list.d
 
-sudo apt-get update
+sudo apt-get update -qq
 
 # remove --force-yes if running manually
 sudo apt-get install --force-yes openrave0.9-dp openrave0.9-dp-base openrave0.9-dp-dev
