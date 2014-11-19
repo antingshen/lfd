@@ -35,7 +35,6 @@ class TestSimulation(unittest.TestCase):
         cyl_pos1 = np.r_[.6, -helix_radius, table_height + .35]
         
         sim_objs = []
-        sim_objs.append(XmlSimulationObject("robots/pr2-beta-static.zae", dynamic=False))
         sim_objs.append(BoxSimulationObject("table", [1, 0, table_height-.1], [.85, .85, .1], dynamic=False))
         sim_objs.append(RopeSimulationObject("rope", init_rope_nodes, rope_params))
         sim_objs.append(CylinderSimulationObject("cyl0", cyl_pos0, cyl_radius, cyl_height, dynamic=True))
@@ -43,16 +42,18 @@ class TestSimulation(unittest.TestCase):
         
         self.sim = DynamicSimulation()
         self.sim.add_objects(sim_objs)
-        self.sim.robot.SetDOFValues([0.25], [self.sim.robot.GetJoint('torso_lift_joint').GetJointIndex()])
-        sim_util.reset_arms_to_side(self.sim)
-        
+
         # rotate cylinders by 90 deg
         for i in range(2):
-            bt_cyl = self.sim.bt_env.GetObjectByName('cyl%d'%i)
-            T = openravepy.matrixFromAxisAngle(np.array([np.pi/2,0,0]))
-            T[:3,3] = bt_cyl.GetTransform()[:3,3]
-            bt_cyl.SetTransform(T) # SetTransform needs to be used in the Bullet object, not the openrave body
+            bt_cyl = self.sim.bt_env.GetObjectByName('cyl%d' % i)
+            T = openravepy.matrixFromAxisAngle(np.array([np.pi/2, 0, 0]))
+            T[:3,3] = bt_cyl.GetTransform()[:3, 3]
+            bt_cyl.SetTransform(T)  # SetTransform needs to be used in the Bullet object, not the openrave body
         self.sim.update()
+
+        self.sim.add_objects([XmlSimulationObject("robots/pr2-beta-static.zae", dynamic=False)])
+        self.sim.robot.SetDOFValues([0.25], [self.sim.robot.GetJoint('torso_lift_joint').GetJointIndex()])
+        sim_util.reset_arms_to_side(self.sim)
     
     def test_reproducibility(self):
         sim_state0 = self.sim.get_state()

@@ -195,11 +195,13 @@ class DynamicSimulation(StaticSimulation):
         self.update()
 
     def update(self):
-        self.bt_robot.UpdateBullet()
+        if self.robot:
+            self.bt_robot.UpdateBullet()
         self._update_rave()
     
     def step(self):
-        self.bt_robot.UpdateBullet()
+        if self.robot:
+            self.bt_robot.UpdateBullet()
         self.bt_env.Step(.01, 200, .005)
         self._update_rave()
 
