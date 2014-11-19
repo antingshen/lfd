@@ -3,7 +3,7 @@ set -ex
 
 # cd ~
 
-sudo aptitude install -y libopenscenegraph-dev
+sudo apt-get install -y libopenscenegraph
 sudo apt-get install -y cmake libboost-all-dev libeigen3-dev
 
 sudo echo "deb http://ppa.launchpad.net/openrave/testing/ubuntu precise main" > openrave-testing.list 
