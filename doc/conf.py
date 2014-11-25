@@ -22,7 +22,10 @@ from mock import Mock as MagicMock
 class Mock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
-            return Mock()
+        return Mock()
+
+    def __getitem__(self, v):
+        return Mock()
 
 MOCK_MODULES = ['bulletsimpy', 'trajoptpy', 'openravepy', 
   'joblib', 'h5py', 'IPython', 

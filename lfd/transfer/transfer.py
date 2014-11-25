@@ -3,11 +3,15 @@ from __future__ import division
 import settings
 import numpy as np
 from lfd.demonstration import demonstration
-from lfd.rapprentice import planning
 from lfd.environment import sim_util
+from lfd.transfer import planning
 
 class TrajectoryTransferer(object):
-    def __init__(self, sim, beta_pos, gamma, use_collision_cost, init_trajectory_transferer=None):
+    def __init__(self, sim, 
+                 beta_pos=settings.BETA_POS, 
+                 gamma=settings.GAMMA, 
+                 use_collision_cost=settings.USE_COLLISION_COST, 
+                 init_trajectory_transferer=None):
         """Inits TrajectoryTransferer
         
         Args:
@@ -41,7 +45,12 @@ class TrajectoryTransferer(object):
         raise NotImplementedError
 
 class PoseTrajectoryTransferer(TrajectoryTransferer):
-    def __init__(self, sim, beta_pos, beta_rot, gamma, use_collision_cost, init_trajectory_transferer=None):
+    def __init__(self, sim, 
+                 beta_pos=settings.BETA_POS, 
+                 beta_rot=settings.BETA_ROT, 
+                 gamma=settings.GAMMA, 
+                 use_collision_cost=settings.USE_COLLISION_COST, 
+                 init_trajectory_transferer=None):
         super(PoseTrajectoryTransferer, self).__init__(sim, beta_pos, gamma, use_collision_cost, init_trajectory_transferer=init_trajectory_transferer)
         self.beta_rot = beta_rot
         
@@ -58,7 +67,7 @@ class PoseTrajectoryTransferer(TrajectoryTransferer):
         
         active_lr = ""
         for lr in 'lr':
-            if sim_util.arm_moved(demo.aug_traj.lr2arm_traj[lr]):
+            if lr in demo.aug_traj.lr2arm_traj and sim_util.arm_moved(demo.aug_traj.lr2arm_traj[lr]):
                 active_lr += lr
         _, timesteps_rs = sim_util.unif_resample(np.c_[(1./settings.JOINT_LENGTH_PER_STEP) * np.concatenate([demo.aug_traj.lr2arm_traj[lr] for lr in active_lr], axis=1), 
                                                        (1./settings.FINGER_CLOSE_RATE) * np.concatenate([demo.aug_traj.lr2finger_traj[lr] for lr in active_lr], axis=1)], 
@@ -124,7 +133,11 @@ class PoseTrajectoryTransferer(TrajectoryTransferer):
         return test_aug_traj
 
 class FingerTrajectoryTransferer(TrajectoryTransferer):
-    def __init__(self, sim, beta_pos, gamma, use_collision_cost, init_trajectory_transferer=None):
+    def __init__(self, sim, 
+                 beta_pos=settings.BETA_POS, 
+                 gamma=settings.GAMMA, 
+                 use_collision_cost=settings.USE_COLLISION_COST, 
+                 init_trajectory_transferer=None):
         super(FingerTrajectoryTransferer, self).__init__(sim, beta_pos, gamma, use_collision_cost, init_trajectory_transferer=init_trajectory_transferer)
 
     def transfer(self, reg, demo, plotting=False):
@@ -140,7 +153,7 @@ class FingerTrajectoryTransferer(TrajectoryTransferer):
         
         active_lr = ""
         for lr in 'lr':
-            if sim_util.arm_moved(demo.aug_traj.lr2arm_traj[lr]):
+            if lr in demo.aug_traj.lr2arm_traj and sim_util.arm_moved(demo.aug_traj.lr2arm_traj[lr]):
                 active_lr += lr
         _, timesteps_rs = sim_util.unif_resample(np.c_[(1./settings.JOINT_LENGTH_PER_STEP) * np.concatenate([demo.aug_traj.lr2arm_traj[lr] for lr in active_lr], axis=1), 
                                                        (1./settings.FINGER_CLOSE_RATE) * np.concatenate([demo.aug_traj.lr2finger_traj[lr] for lr in active_lr], axis=1)], 
@@ -157,7 +170,6 @@ class FingerTrajectoryTransferer(TrajectoryTransferer):
         for lr in active_lr:
             arm_name = {"l":"leftarm", "r":"rightarm"}[lr]
             finger_name = "%s_gripper_l_finger_joint"%lr
-            ee_link_name = "%s_gripper_tool_frame"%lr
             
             if manip_name:
                 manip_name += "+"
