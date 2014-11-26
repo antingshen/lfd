@@ -109,32 +109,12 @@ class StaticSimulation(object):
         if camera_matrix is None:
             camera_matrix = settings.CAMERA_MATRIX
         self.viewer.SetCameraManipulatorMatrix(np.asarray(camera_matrix))
-    
+
     def _exclude_gripper_finger_collisions(self):
-        if not self.robot:
-            return
-        cc = trajoptpy.GetCollisionChecker(self.env)
-        for lr in 'lr':
-            for flr in 'lr':
-                finger_link_name = "%s_gripper_%s_finger_tip_link" % (lr, flr)
-                finger_link = self.robot.GetLink(finger_link_name)
-                for sim_obj in self.sim_objs:
-                    for bt_obj in sim_obj.get_bullet_objects():
-                        for link in bt_obj.GetKinBody().GetLinks():
-                            cc.ExcludeCollisionPair(finger_link, link)
-    
+        pass
+
     def _include_gripper_finger_collisions(self):
-        if not self.robot:
-            return
-        cc = trajoptpy.GetCollisionChecker(self.env)
-        for lr in 'lr':
-            for flr in 'lr':
-                finger_link_name = "%s_gripper_%s_finger_tip_link" % (lr, flr)
-                finger_link = self.robot.GetLink(finger_link_name)
-                for sim_obj in self.sim_objs:
-                    for bt_obj in sim_obj.get_bullet_objects():
-                        for link in bt_obj.GetKinBody().GetLinks():
-                            cc.IncludeCollisionPair(finger_link, link)
+        pass
 
     @staticmethod
     def simulation_state_equal(s0, s1):
