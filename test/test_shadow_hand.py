@@ -7,6 +7,7 @@ import unittest
 
 import numpy as np
 import trajoptpy
+from time import sleep
 
 from lfd.environment.simulation import DynamicSimulation
 from lfd.environment.simulation_object import XmlSimulationObject, BoxSimulationObject, CylinderSimulationObject, RopeSimulationObject
@@ -33,7 +34,7 @@ class TestShadowHand():
         init_rope_nodes = np.c_[helix_center + helix_radius * np.c_[np.cos(helix_angs), np.sin(helix_angs)], helix_heights]
         rope_params = sim_util.RopeParams()
 
-        cyl_radius = 0.025
+        cyl_radius = 0.018
         cyl_height = 0.3
         cyl_pos0 = np.r_[.6, helix_radius, table_height + .15]
         cyl_pos1 = np.r_[.6, -helix_radius, table_height + .15]
@@ -57,7 +58,7 @@ class TestShadowHand():
         self.sim.add_objects([XmlSimulationObject("robots/shadow-hand.zae", dynamic=False)])
 
         transform = openravepy.matrixFromAxisAngle(np.array([np.pi, 0, 0]))
-        transform[:3, 3] = [0.535, 0.143, 0]
+        transform[:3, 3] = [0,0,0]
         self.sim.robot.SetTransform(transform)
 
 
@@ -65,20 +66,40 @@ class ShadowHandDynamicSimulation(DynamicSimulation):
     def __init__(self, env=None):
         super(ShadowHandDynamicSimulation, self).__init__(env=env)
 
-    def close_hand(self, target_val=None, step_viewer=1, max_vel=.02):
+    FINGER_CLOSED_DOF = 1.2
+    FINGER_OPEN_DOF = 0
+    FINGERS = [1,2,3]
+    def close_fingers(self, target_vals=None, max_vel=.02):
         # generate gripper finger trajectory
-        joint_ind = self.robot.GetJoint("%s_gripper_l_finger_joint" % lr).GetDOFIndex()
-        start_val = self.robot.GetDOFValues([joint_ind])[0]
-        if target_val is None:
-            target_val = sim_util.get_binary_gripper_angle(True)
-        joint_traj = np.linspace(start_val, target_val, np.ceil(abs(target_val - start_val) / max_vel))
+
+        joint_inds = [self.robot.GetJoint("JF%d_2" % finger_number).GetDOFIndex() for finger_number in self.FINGERS]
+        start_vals = self.robot.GetDOFValues(joint_inds)
+        if target_vals is None:
+            target_vals = [self.FINGER_CLOSED_DOF] * len(self.FINGERS)
+        max_dist = max(map(lambda x: abs(x[1] - x[0]), zip(start_vals, target_vals)))
+        joint_trajs = [np.linspace(start_val, target_val, np.ceil(max_dist / max_vel)) for start_val, target_val in zip(start_vals, target_vals)]
 
         # execute gripper finger trajectory
-        for val in joint_traj:
-            self.robot.SetDOFValues([val], [joint_ind])
+        for vals in zip(*joint_trajs):
+            self.robot.SetDOFValues(vals, joint_inds)
             self.step()
-        if self.viewer and step_viewer:
             self.viewer.Step()
+
+    def open_fingers(self, **kwargs):
+        self.close_fingers(target_vals=[self.FINGER_OPEN_DOF]*len(self.FINGERS), **kwargs)
+
+    def set_hand_location(self, location, max_vel=.002):
+        transform = self.robot.GetTransform()
+        starts = transform[:3, 3]
+        max_dist = max(map(lambda x: abs(x[1] - x[0]), zip(starts, location)))
+        traj = [np.linspace(start, target, np.ceil(max_dist / max_vel)) for start, target in zip(starts, location)]
+
+        for vals in zip(*traj):
+            transform[:3, 3] = vals
+            self.robot.SetTransform(transform)
+            self.step()
+            self.viewer.Step()
+
 
 T = TestShadowHand()
 T.setUp()
@@ -86,5 +107,9 @@ robot = T.sim.robot
 sim = T.sim
 sim.create_viewer()
 viewer = sim.viewer
-viewer.Step()
+
+sim.set_hand_location([0.51, 0.155, 0])
+sim.close_fingers()
+sim.set_hand_location([0.51, 0, 0])
+sim.open_fingers()
 sim.settle()

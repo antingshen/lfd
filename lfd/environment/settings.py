@@ -19,7 +19,7 @@ ROPE_MASS          = 1.0
 ROPE_RADIUS_THICK  = .008
 
 #: window properties for the viewer's window
-WINDOW_PROP = [0,0,1500,1500]
+WINDOW_PROP = [0,0,800,600]
 #: transposed homogeneous matrix for the viewer's camera
 CAMERA_MATRIX = [[    0, 1,   0, 0],
 				 [   -1, 0, 0.5, 0],
